@@ -10,4 +10,6 @@ public class DailySale {
     private Integer quantity; // 销售数量
     private Double amount;    // 销售金额
 
+    private Integer drugId;
+
 }

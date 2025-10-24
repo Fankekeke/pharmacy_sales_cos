@@ -113,5 +113,5 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
      * @param endTime 结束时间
      * @return 结果
      */
-    List<DrugSales> getPharmacyHistoricalSales(@Param("pharmacyId") Integer pharmacyId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+    List<DailySale> getPharmacyHistoricalSales(@Param("pharmacyId") Integer pharmacyId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 }

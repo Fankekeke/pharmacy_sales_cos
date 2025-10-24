@@ -1,10 +1,8 @@
 package cc.mrbird.febs.cos.service.impl;
 
 import cc.mrbird.febs.cos.dao.OrderInfoMapper;
-import cc.mrbird.febs.cos.entity.DailySale;
-import cc.mrbird.febs.cos.entity.DrugSales;
-import cc.mrbird.febs.cos.entity.OrderItem;
-import cc.mrbird.febs.cos.entity.PredictionResult;
+import cc.mrbird.febs.cos.entity.*;
+import cc.mrbird.febs.cos.service.IDrugInfoService;
 import cc.mrbird.febs.cos.service.IOrderInfoService;
 import cc.mrbird.febs.cos.service.IPharmacyInventoryService;
 import cc.mrbird.febs.cos.service.IPredictionService;
@@ -27,6 +25,9 @@ public class PredictionServiceImpl implements IPredictionService {
 
     @Resource
     private OrderInfoMapper orderInfoMapper;
+
+    @Resource
+    private IDrugInfoService drugInfoService;
 
     @Override
     public PredictionResult predictSales(Integer drugId, Integer days) {
@@ -158,7 +159,7 @@ public class PredictionServiceImpl implements IPredictionService {
         // 确保返回的数据按日期排序
         if (historicalSales != null) {
             // 如果需要按日期排序，可以在这里添加排序逻辑
-            // Collections.sort(historicalSales, Comparator.comparing(OrderItem::getDate));
+             Collections.sort(historicalSales, Comparator.comparing(OrderItem::getDate));
             return historicalSales;
         }
         return Collections.emptyList();
@@ -172,12 +173,33 @@ public class PredictionServiceImpl implements IPredictionService {
         // 计算查询起始日期
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(days);
-        List<DrugSales> historicalSales = orderInfoMapper.getPharmacyHistoricalSales(
+        List<DailySale> historicalSales = orderInfoMapper.getPharmacyHistoricalSales(
                 pharmacyId,
                 startDate.atStartOfDay(),
                 endDate.atStartOfDay()
         );
+        // 获取所有药品
+        List<DrugInfo> drugInfoList = drugInfoService.list();
+        List<DrugSales> result = new ArrayList<>();
 
-        return historicalSales != null ? historicalSales : Collections.emptyList();
+        // 按药品分组处理销售数据
+        Map<Integer, List<DailySale>> drugSalesMap = new HashMap<>();
+        if (historicalSales != null) {
+            for (DailySale dailySale : historicalSales) {
+                Integer drugId = dailySale.getDrugId();
+                drugSalesMap.computeIfAbsent(drugId, k -> new ArrayList<>()).add(dailySale);
+            }
+        }
+
+        // 构建DrugSales对象
+        for (DrugInfo drugInfo : drugInfoList) {
+            DrugSales drugSales = new DrugSales();
+            drugSales.setDrugId(drugInfo.getId());
+            drugSales.setDrugName(drugInfo.getName());
+            drugSales.setDailySales(drugSalesMap.getOrDefault(drugInfo.getId(), new ArrayList<>()));
+            result.add(drugSales);
+        }
+
+        return result;
     }
 }
