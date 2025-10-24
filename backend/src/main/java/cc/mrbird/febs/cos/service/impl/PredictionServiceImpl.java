@@ -32,7 +32,7 @@ public class PredictionServiceImpl implements IPredictionService {
     @Override
     public PredictionResult predictSales(Integer drugId, Integer days) {
         // 获取历史销售数据（例如过去90天）
-        List<OrderItem> historicalSales = getHistoricalSalesData(drugId, 90);
+        List<OrderItem> historicalSales = getHistoricalSalesData(drugId, 15);
 
         // 计算移动平均值
         double movingAverage = calculateMovingAverage(historicalSales, 7); // 7日移动平均
@@ -42,9 +42,15 @@ public class PredictionServiceImpl implements IPredictionService {
         List<Double> predictions = new ArrayList<>();
         List<String> dates = new ArrayList<>();
 
-        // 使用移动平均值作为未来几天的预测值
+        // 引入趋势因子0.05，使预测值逐日递增
+        double trendRate = 0.05;
+
+        // 使用移动平均值作为基础值，并应用趋势因子
         for (int i = 1; i <= days; i++) {
-            predictions.add(movingAverage);
+            double predictedValue = new java.math.BigDecimal(movingAverage * (1.0 + trendRate * i))
+                    .setScale(1, java.math.RoundingMode.HALF_UP)
+                    .doubleValue();
+            predictions.add(predictedValue);
             dates.add(LocalDate.now().plusDays(i).toString());
         }
 
@@ -58,7 +64,7 @@ public class PredictionServiceImpl implements IPredictionService {
     @Override
     public PredictionResult predictInventoryDemand(Integer pharmacyId, Integer days) {
         // 获取药店历史销售数据
-        List<DrugSales> historicalSales = getPharmacyHistoricalSales(pharmacyId, 90);
+        List<DrugSales> historicalSales = getPharmacyHistoricalSales(pharmacyId, 15);
 
         // 计算每种药品的移动平均需求量
         Map<Integer, Double> avgDailyDemand = new HashMap<>();
@@ -73,19 +79,56 @@ public class PredictionServiceImpl implements IPredictionService {
         List<Double> predictions = new ArrayList<>();
         List<String> dates = new ArrayList<>();
 
+        // 引入趋势因子
+        double trendRate = 0.05;
+
         // 计算每天的总需求预测
         for (int i = 1; i <= days; i++) {
-            double dailyTotalDemand = avgDailyDemand.values().stream()
+            // 基础总需求量
+            double baseTotalDemand = avgDailyDemand.values().stream()
                     .mapToDouble(Double::doubleValue)
                     .sum();
-            predictions.add(dailyTotalDemand);
+            // 上架因子（新品上市带来的增长）
+            double launchFactor = 1.0 + 0.02 * Math.max(0, i - 10); // 假设第10天后开始影响
+            // 下架因子（老产品逐渐减少）
+            double delistFactor = 1.0 - 0.02 * Math.max(0, i - 15); // 假设第20天后开始影响
+            // 应用所有因子计算最终需求量
+            double dailyTotalDemand = baseTotalDemand * (1.0 + trendRate * i) * launchFactor * delistFactor;
+            // 保留小数点后一位
+            double roundedValue = new java.math.BigDecimal(dailyTotalDemand)
+                    .setScale(1, java.math.RoundingMode.HALF_UP)
+                    .doubleValue();
+            predictions.add(roundedValue);
             dates.add(LocalDate.now().plusDays(i).toString());
+        }
+
+        // 为每个药品计算预测值
+        Map<String, List<Double>> drugPredictions = new HashMap<>();
+        for (Map.Entry<Integer, Double> entry : avgDailyDemand.entrySet()) {
+            Integer drugId = entry.getKey();
+            Double avgDemand = entry.getValue();
+
+            // 通过drugId获取药品名称
+            String drugName = historicalSales.stream()
+                    .filter(sale -> sale.getDrugId().equals(drugId))
+                    .findFirst()
+                    .map(DrugSales::getDrugName)
+                    .orElse("Unknown");
+
+            List<Double> drugPredictionList = new ArrayList<>();
+            for (int i = 1; i <= days; i++) {
+                double predictedValue = new java.math.BigDecimal(avgDemand * (1.0 + trendRate * i))
+                        .setScale(1, java.math.RoundingMode.HALF_UP)
+                        .doubleValue();
+                drugPredictionList.add(predictedValue);
+            }
+            drugPredictions.put(drugName, drugPredictionList);
         }
 
         result.setPredictedValues(predictions);
         result.setDates(dates);
+        result.setDrugPredictions(drugPredictions); // 需要在PredictionResult中添加此字段
         result.setConfidence(0.85); // 简单设定置信度
-
         return result;
     }
 

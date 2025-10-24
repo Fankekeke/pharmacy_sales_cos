@@ -23,7 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2b51975f-5e37-45a1-bd9d-0f3c12f944d0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/views/prediction/inventory/Inventory.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/views/prediction/sales/Sales.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +93,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "G:/Project/20250111药房在线管理系统/pharmacy_online_public_cos/frontend",
+    "last_opened_file_path": "G:/Project/20251024基于长短期记忆人工神经网络的药店管理销售系统/pharmacy_sales_cos/frontend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -252,6 +257,7 @@
       <workItem from="1745677134010" duration="194000" />
       <workItem from="1745756042643" duration="750000" />
       <workItem from="1745847752581" duration="5155000" />
+      <workItem from="1761311914971" duration="6379000" />
     </task>
     <servers />
   </component>

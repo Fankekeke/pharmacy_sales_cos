@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class PredictionResult {
@@ -12,5 +13,6 @@ public class PredictionResult {
     private Double confidence;             // 预测置信度
     private String modelVersion;           // 模型版本
     private Date createTime;               // 创建时间
+    private Map<String, List<Double>> drugPredictions;
 
 }
