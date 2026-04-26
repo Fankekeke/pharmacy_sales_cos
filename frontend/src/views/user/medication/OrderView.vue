@@ -77,13 +77,13 @@
         </a-col>
       </a-row>
       <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">当前物流</span></a-col>
-         <a-col :span="24">
-          <a-table :columns="logisticsColumns" :data-source="logisticsList">
-          </a-table>
-        </a-col>
-      </a-row>
+<!--      <a-row style="padding-left: 24px;padding-right: 24px;">-->
+<!--        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">当前物流</span></a-col>-->
+<!--         <a-col :span="24">-->
+<!--          <a-table :columns="logisticsColumns" :data-source="logisticsList">-->
+<!--          </a-table>-->
+<!--        </a-col>-->
+<!--      </a-row>-->
     </div>
   </a-modal>
 </template>
